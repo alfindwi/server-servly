@@ -1,9 +1,9 @@
 import { prisma } from "../libs/prisma";
-import { LoginDTO, RegisterDTO } from "../dto/authDto";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { loginDTO, registerDTO } from "../dto/authDto";
 
-export const loginService = async (data: LoginDTO) => {
+export const loginService = async (data: loginDTO) => {
   try {
     const user = await prisma.user.findUnique({
       where: { email: data.email },
@@ -51,7 +51,7 @@ export const loginService = async (data: LoginDTO) => {
   }
 };
 
-export const registeerService = async (data: RegisterDTO) => {
+export const registeerService = async (data: registerDTO) => {
   try {
     const existedUser = await prisma.user.findUnique({
       where: { email: data.email },
