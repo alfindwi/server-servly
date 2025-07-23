@@ -32,3 +32,49 @@ export const applyAsWorker = async (
     throw error;
   }
 };
+
+export const getWorkersApplyed = async () => {
+  try {
+    const workers = await prisma.workerProfile.findMany({
+      where: {
+        isVerified: false,
+      },
+    });
+
+    if (!workers) {
+      throw new Error("No workers applied yet");
+    }
+
+    return workers;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+export const approveWorker = async (workerId: number) => {
+  try {
+    const findWorker = await prisma.workerProfile.findUnique({
+      where: {
+        id: workerId,
+      },
+    });
+    if (!findWorker) {
+      throw new Error("Worker not found");
+    }
+
+    const approvedWorker = await prisma.workerProfile.update({
+      where: {
+        id: workerId,
+      },
+      data: {
+        isVerified: true,
+      },
+    });
+
+    return approvedWorker;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
