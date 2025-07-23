@@ -1,4 +1,5 @@
 export interface CreateWorkerProfileDTO {
+  userId: number;
   bio: string;
   experience: number;
   city: string;

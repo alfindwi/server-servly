@@ -10,7 +10,7 @@ export const login = async (req: Request, res: Response) => {
 
     const token = await authService.loginService(data);
 
-    res.status(200).json({ token });
+    res.status(200).json(token);
   } catch (error) {
     console.log(error);
 
