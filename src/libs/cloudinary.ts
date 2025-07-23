@@ -7,10 +7,13 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET
 })
 
-export const uploader = async (file : Express.Multer.File) => {
-    const b64 = Buffer.from(file.buffer).toString('base64')
-    const dataURI = 'data:' + file.mimetype + ';base64, ' + b64
-    return await cloudinary.uploader.upload(dataURI, {
-        folder: process.env.CLOUDINARY_UPLOAD_FOLDER
-    })
+const uploader = async (file: Express.Multer.File) => {
+
+  const b64 = Buffer.from(file.buffer).toString('base64')
+  const dataURI = 'data:' + file.mimetype + ';base64,' + b64
+  return await cloudinary.uploader.upload(dataURI, {
+    folder: 'servly'
+  })
 }
+
+export default uploader

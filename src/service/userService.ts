@@ -1,7 +1,7 @@
 import { prisma } from "../libs/prisma";
 import { updateUserDTO } from "../dto/authDto";
 import { v2 as cloudinary } from "cloudinary";
-import { uploader } from "../libs/cloudinary";
+import uploader from "../libs/cloudinary";
 
 export const updateUser = async (
   userId: number,
