@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { CreateworkerSchema } from "../validation/workerSchema";
 import * as workerService from "../service/workerService";
-import { CreateWorkerProfileDTO } from "../dto/workerDto";
+import { CreateWorkerProfileDTO, UpdateWorkerProfileDTO } from "../dto/workerDto";
 
 export const createWorker = async (req: Request, res: Response) => {
   try {
@@ -29,6 +29,23 @@ export const createWorker = async (req: Request, res: Response) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+export const updateWorker = async (req: Request, res: Response) => {
+  try {
+    const workerId = res.locals.user.id;
+    
+    const data : UpdateWorkerProfileDTO = req.body;
+
+    const worker = await workerService.updateWorker(workerId, data, req.file);
+
+    res.status(200).json({ message: "Worker updated successfully", worker });
+  } catch (error) {
+    console.log(error);
+    const err = error as Error;
+    res.status(500).json({ error: err.message });
+  }
+}
+
 
 export const approveWorker = async (req: Request, res: Response) => {
   try {

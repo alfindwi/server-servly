@@ -74,7 +74,7 @@ model Category {
 }
 
 model Service {
-  id         String   @id @default(ulid())
+  id         String   @id @default(uuid())
   categoryId Int
   category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 

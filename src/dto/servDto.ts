@@ -7,6 +7,7 @@ export interface createServiceDTO {
 }
 
 export interface updateServiceDTO {
+  categoryId: number;
   name?: string;
   description?: string;
   basePrice?: number;

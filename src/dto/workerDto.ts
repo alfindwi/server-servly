@@ -1,3 +1,5 @@
+import { updateUserDTO } from "./userDto";
+
 export interface CreateWorkerProfileDTO {
   userId: number;
   bio: string;
@@ -6,7 +8,7 @@ export interface CreateWorkerProfileDTO {
   province: string;
 }
 
-export interface UpdateWorkerProfileDTO {
+export interface UpdateWorkerProfileDTO extends updateUserDTO {
   bio?: string;
   experience?: number;
   city?: string;

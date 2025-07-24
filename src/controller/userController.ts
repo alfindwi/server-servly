@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { updateUserSchema } from "../validation/userSchema";
 import * as authService from "../service/userService";
-import { updateUserDTO } from "../dto/authDto";
+import { updateUserDTO } from "../dto/userDto";
 
 export const updateUser = async (req: Request, res: Response) => {
   try {
@@ -17,3 +17,4 @@ export const updateUser = async (req: Request, res: Response) => {
     res.status(500).json({ error: err.message });
   }
 };
+
