@@ -74,7 +74,7 @@ describe("authService", () => {
     });
   });
 
-  describe("registeerService", () => {
+  describe("registerService", () => {
     it("should register new user successfully", async () => {
       (prisma.user.findUnique as jest.Mock).mockResolvedValue(null);
       (bcrypt.hash as jest.Mock).mockResolvedValue("hashedPassword");
@@ -85,7 +85,7 @@ describe("authService", () => {
         fullName: "New User",
       });
 
-      const result = await authService.registeerService({
+      const result = await authService.registerService({
         email: "new@example.com",
         password: "pass123",
         fullName: "New User",
@@ -114,7 +114,7 @@ describe("authService", () => {
       (prisma.user.findUnique as jest.Mock).mockResolvedValue({ id: 1, email: "exists@example.com" });
 
       await expect(
-        authService.registeerService({ email: "exists@example.com", password: "pass", fullName: "Exists" })
+        authService.registerService({ email: "exists@example.com", password: "pass", fullName: "Exists" })
       ).rejects.toThrow("User already exists");
     });
   });

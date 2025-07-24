@@ -23,7 +23,7 @@ export const register = async (req: Request, res: Response) => {
   try {
     const data = registerSchema.parse(req.body);
 
-    const user = await authService.registeerService(data);
+    const user = await authService.registerService(data);
 
     res.status(200).json({ user });
   } catch (error) {

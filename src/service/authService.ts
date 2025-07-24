@@ -51,7 +51,7 @@ export const loginService = async (data: loginDTO) => {
   }
 };
 
-export const registeerService = async (data: registerDTO) => {
+export const registerService = async (data: registerDTO) => {
   try {
     const existedUser = await prisma.user.findUnique({
       where: { email: data.email },
