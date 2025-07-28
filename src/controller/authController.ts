@@ -1,8 +1,7 @@
 import { Request, Response } from "express";
-import * as authService from "../service/authService";
-import { loginDTO, registerDTO } from "../dto/authDto";
-import { loginSchema, registerSchema } from "../validation/authSchema";
 import { ZodError } from "zod";
+import * as authService from "../service/authService";
+import { loginSchema, registerSchema } from "../validation/authSchema";
 
 export const login = async (req: Request, res: Response) => {
   try {

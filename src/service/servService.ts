@@ -1,11 +1,15 @@
 import { createServiceDTO, updateServiceDTO } from "../dto/servDto";
+import { getOrSetCache } from "../libs/cache";
 import { prisma } from "../libs/prisma";
 
 export const getService = async () => {
   try {
-    const services = await prisma.service.findMany({
+    const cache = "services:all";
+    const ttl = 60 * 10;
+
+    return await getOrSetCache(cache, ttl, async () => {
+      const services = await prisma.service.findMany({
         select: {
-            id: true,
             name: true,
             description: true,
             basePrice: true,
@@ -19,6 +23,7 @@ export const getService = async () => {
     });
 
     return services;
+    })
   } catch (error) {
     console.log(error);
     throw error;

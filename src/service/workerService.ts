@@ -1,10 +1,144 @@
+import { v2 as cloudinary } from "cloudinary";
 import {
   CreateWorkerProfileDTO,
   UpdateWorkerProfileDTO,
 } from "../dto/workerDto";
-import { prisma } from "../libs/prisma";
-import { v2 as cloudinary } from "cloudinary";
+import { getOrSetCache } from "../libs/cache";
 import uploader from "../libs/cloudinary";
+import { prisma } from "../libs/prisma";
+
+export const getAllWorker = async () => {
+  try {
+    const cacheKey = "workers:all";
+    const ttl = 60 * 10;
+
+    return await getOrSetCache(cacheKey, ttl, async () => {
+      const workers = await prisma.user.findMany({
+        where: {
+          role: "WORKER",
+        },
+        include: {
+          workerProfile: {
+            include: {
+              user: {
+                select: {
+                  fullName: true,
+                  phone: true,
+                  email: true,
+                  address: true,
+                  avatar: true,
+                },
+              },
+              Skills: {  
+                include: {
+                  service: {
+                    select: {
+                      name: true,
+                      description: true,
+                      duration: true,
+                      basePrice: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      });
+
+      if (!workers || workers.length === 0) {
+        throw new Error("No workers found");
+      }
+
+      return workers;
+    });
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+
+
+export const getWorkerByService = async (serviceId: string) => {
+  try {
+    const worker = await prisma.workerProfile.findMany({
+      where: {
+        Skills: {
+          some: {
+            service: {
+              id: serviceId,
+            },
+          },
+        },
+        isVerified: true,
+      },
+      include: {
+        user: {
+          select: {
+            fullName: true,
+            phone: true,
+            email: true,
+            address: true,
+            avatar: true,
+          },
+        },
+        Skills: {
+          include: {
+            service: {
+              select: {
+                name: true,
+                description: true,
+                duration: true,
+                basePrice: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!worker) {
+      throw new Error("No workers found");
+    }
+
+    return worker;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+export const filterWorkerByCity = async (city: string) => {
+  try {
+    const worker = await prisma.workerProfile.findMany({
+      where: {
+        city: city,
+        isVerified: true,
+      },
+      include: {
+        user: {
+          select: {
+            fullName: true,
+            phone: true,
+            email: true,
+            address: true,
+            avatar: true,
+          },
+        },
+      },
+    });
+
+    if (!worker) {
+      throw new Error("No workers found");
+    }
+
+    return worker;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
 
 export const applyAsWorker = async (
   userId: number,
@@ -96,7 +230,7 @@ export const updateWorker = async (
             province: true,
           },
         },
-      }
+      },
     });
 
     return updateWorker;
@@ -141,7 +275,7 @@ export const approveWorker = async (workerId: number) => {
       throw new Error("Worker not found");
     }
 
-    const approvedWorker = await prisma.workerProfile.update({
+    await prisma.workerProfile.update({
       where: {
         id: workerId,
       },

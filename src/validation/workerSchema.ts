@@ -13,3 +13,12 @@ export const UpdateworkerSchema = z.object({
     city: z.string().optional(),
     province: z.string().optional(),
 });
+
+
+export const addWorkerSkillSchema = z.object({
+  serviceId: z.string().min(1, { message: "Service ID is required" }),
+});
+
+export const updateWorkerSkillSchema = z.object({
+  serviceId: z.string().min(1, { message: "Service ID is required" }),
+});
