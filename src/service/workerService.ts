@@ -253,7 +253,7 @@ export const getWorkersApplyed = async () => {
       },
     });
 
-    if (!workers) {
+    if (!workers || workers.length === 0) {
       throw new Error("No workers applied yet");
     }
 
@@ -263,6 +263,7 @@ export const getWorkersApplyed = async () => {
     throw error;
   }
 };
+
 
 export const approveWorker = async (workerId: number) => {
   try {

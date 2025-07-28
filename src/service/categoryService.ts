@@ -1,16 +1,22 @@
+import { getOrSetCache } from "../libs/cache";
 import { prisma } from "../libs/prisma";
 
 export const getCategories = async () => {
   try {
-    const categories = await prisma.category.findMany({
-      select: {
-        id: true,
-        name: true,
-        description: true,
-      },
-    });
+    const cache = "categories:all";
+    const ttl = 60 * 10;
 
-    return categories;
+    return await getOrSetCache(cache, ttl, async () => {
+      const categories = await prisma.category.findMany({
+        select: {
+          id: true,
+          name: true,
+          description: true,
+        },
+      });
+
+      return categories;
+    });
   } catch (error) {
     console.log(error);
     throw error;
