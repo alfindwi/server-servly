@@ -1,0 +1,36 @@
+# Gunakan image node
+FROM node:18
+
+# Buat app directory
+WORKDIR /usr/src/app
+
+# Copy package.json dan install dependencies
+COPY package*.json ./
+RUN npm install
+
+# Copy seluruh project
+COPY . .
+
+# Expose port
+EXPOSE 3000
+
+# Jalankan app
+CMD [ "npm", "start" ]
+# Gunakan image node
+FROM node:18
+
+# Buat app directory
+WORKDIR /usr/src/app
+
+# Copy package.json dan install dependencies
+COPY package*.json ./
+RUN npm install
+
+# Copy seluruh project
+COPY . .
+
+# Expose port
+EXPOSE 3000
+
+# Jalankan app
+CMD [ "npm", "start" ]

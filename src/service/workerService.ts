@@ -25,7 +25,6 @@ export const getAllWorker = async () => {
                   fullName: true,
                   phone: true,
                   email: true,
-                  address: true,
                   avatar: true,
                 },
               },
@@ -79,7 +78,6 @@ export const getWorkerByService = async (serviceId: string) => {
             fullName: true,
             phone: true,
             email: true,
-            address: true,
             avatar: true,
           },
         },
@@ -122,7 +120,6 @@ export const filterWorkerByCity = async (city: string) => {
             fullName: true,
             phone: true,
             email: true,
-            address: true,
             avatar: true,
           },
         },
@@ -210,7 +207,6 @@ export const updateWorker = async (
       data: {
         fullName: data.fullName,
         phone: data.phone,
-        address: data.address,
         ...avatarData,
         workerProfile: {
           update: {
