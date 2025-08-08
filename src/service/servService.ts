@@ -10,20 +10,26 @@ export const getService = async () => {
     return await getOrSetCache(cache, ttl, async () => {
       const services = await prisma.service.findMany({
         select: {
-            name: true,
-            description: true,
-            basePrice: true,
-            duration: true,
-            category: {
-                select: {
-                    name: true,
-                },
+          id: true,
+          name: true,
+          description: true,
+          basePrice: true,
+          duration: true,
+          category: {
+            select: {
+              name: true,
             },
-        }
-    });
+          },
+        },
+      });
 
-    return services;
-    })
+      const formated = services.map((service) => ({
+        ...service,
+        basePrice: service.basePrice?.toString() || null,
+      }))
+
+      return formated;
+    });
   } catch (error) {
     console.log(error);
     throw error;

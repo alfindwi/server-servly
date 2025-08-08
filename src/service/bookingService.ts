@@ -4,9 +4,14 @@ import {
   UpdateBookScheduleDTO,
   updateBookStatus,
 } from "../dto/bookingDto";
+import { getOrSetCache } from "../libs/cache";
 import { prisma } from "../libs/prisma";
+import { formatDate } from "../utils/dateFomat";
 
-export const createBooking = async (data: CreateBookDTO, customerId: number) => {
+export const createBooking = async (
+  data: CreateBookDTO,
+  customerId: number
+) => {
   try {
     const skill = await prisma.workerSkill.findFirst({
       where: {
@@ -20,23 +25,40 @@ export const createBooking = async (data: CreateBookDTO, customerId: number) => 
     }
 
     const now = new Date();
-    if (new Date(data.schedule) < now) {
+    const scheduleDate = new Date(data.schedule);
+
+    if (scheduleDate < now) {
       throw new Error("Schedule must be in the future");
     }
+
+    const bookingDate = new Date(data.bookingDate)
+      .toISOString()
+      .slice(0, 10)
+      .replace("T", " ");
+    const scheduledAt = new Date(data.schedule)
+      .toISOString()
+      .slice(0, 10)
+      .replace("T", " ");
 
     const booking = await prisma.booking.create({
       data: {
         customerId: customerId,
         workerId: data.workerId,
         serviceId: data.serviceId,
-        bookingDate: data.bookingDate,
-        scheduledAt: data.schedule,
+        bookingDate,
+        scheduledAt,
         notes: data.note,
         status: "PENDING",
       },
     });
 
-    return booking;
+    const bookingResponse = {
+      ...booking,
+      bookingDate: formatDate(booking.bookingDate),
+      scheduledAt: formatDate(booking.scheduledAt),
+    };
+
+    return bookingResponse;
   } catch (error) {
     console.log(error);
     throw error;
@@ -77,21 +99,57 @@ export const getBookingById = async (bookingId: number, userId: number) => {
 
 export const getBooking = async (userId: number, role: Role) => {
   try {
-    const bookings = await prisma.booking.findMany({
-      where:
-        role === "CUSTOMER" ? { customerId: userId } : { workerId: userId },
-      include: {
-        customer: true,
-        worker: {
-          include: {
-            user: true,
+    const cache = `bookings:all`;
+    const ttl = 60 * 10;
+
+    return await getOrSetCache(cache, ttl, async () => {
+      const bookings = await prisma.booking.findMany({
+        where:
+          role === "CUSTOMER" ? { customerId: userId } : { workerId: userId },
+        omit: {
+          createdAt: true,
+          updatedAt: true,
+        },
+        include: {
+          customer: {
+            omit: {
+              createdAt: true,
+              updatedAt: true,
+              password: true,
+            },
+          },
+          worker: {
+            omit: {
+              createdAt: true,
+              updatedAt: true,
+            },
+            include: {
+              user: {
+                omit: {
+                  createdAt: true,
+                  password: true,
+                  updatedAt: true,
+                },
+              },
+            },
+          },
+          service: {
+            omit: {
+              createdAt: true,
+              updatedAt: true,
+            },
           },
         },
-        service: true,
-      },
-    });
+      });
 
-    return bookings;
+      const formatedBookings = bookings.map((booking) => ({
+        ...booking,
+        bookingDate: formatDate(booking.bookingDate),
+        scheduledAt: formatDate(booking.scheduledAt),
+      }));
+
+      return formatedBookings;
+    });
   } catch (error) {
     console.log(error);
     throw error;
@@ -118,16 +176,23 @@ export const updateBookingSchedule = async (
       throw new Error("Cannot update schedule of non-pending booking");
     }
 
-    return await prisma.booking.update({
+    const scheduledAt = new Date(data.schedule ?? booking.scheduledAt);
+
+    const updateSchdule = await prisma.booking.update({
       where: {
         id: bookId,
       },
       data: {
-        bookingDate: data.bookingDate,
-        scheduledAt: data.schedule,
-        notes: data.note,
+        scheduledAt,
       },
     });
+
+    const formatedSchdule = {
+      ...updateSchdule,
+      scheduledAt: formatDate(updateSchdule.scheduledAt),
+    };
+
+    return formatedSchdule;
   } catch (error) {
     console.log(error);
     throw error;
@@ -176,12 +241,12 @@ export const deleteBooking = async (bookId: number, userId: number) => {
       },
     });
 
-    if(!booking || booking.customerId !== userId) {
-        throw new Error("Unauthorized to delete this booking");
+    if (!booking || booking.customerId !== userId) {
+      throw new Error("Unauthorized to delete this booking");
     }
 
-    if(booking.status !== "PENDING") {
-        throw new Error("Only pending booking can be deleted");
+    if (booking.status !== "PENDING") {
+      throw new Error("Only pending booking can be deleted");
     }
 
     return await prisma.booking.delete({ where: { id: bookId } });

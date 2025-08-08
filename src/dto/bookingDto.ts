@@ -1,5 +1,4 @@
 export interface CreateBookDTO {
-  customerId: number;
   workerId: number;
   serviceId: string;
   bookingDate: Date;
@@ -8,9 +7,7 @@ export interface CreateBookDTO {
 }
 
 export interface UpdateBookScheduleDTO  {
-  bookingDate?: Date;
   schedule?: Date;
-  note?: string;
 }
 
 export interface updateBookStatus {
