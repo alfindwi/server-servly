@@ -1,7 +1,7 @@
 export interface CreateBookDTO {
   workerId: number;
   serviceId: string;
-  bookingDate: Date;
+  bookingDate?: Date;
   schedule: Date;
   note?: string;
 }
@@ -11,5 +11,5 @@ export interface UpdateBookScheduleDTO  {
 }
 
 export interface updateBookStatus {
-  status: "CONFIRMED" | "CANCELLED" | "COMPLETED";
+  status: "CONFIRMED" | "CANCELLED" | "COMPLETED" | "REJECTED" | "IN_PROGRESS";
 }

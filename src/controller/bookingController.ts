@@ -22,7 +22,7 @@ export const getBookings = async (req: Request, res: Response) => {
     const role = res.locals.user.role;
     const bookings = await bookingService.getBooking(userId, role);
 
-    res.status(200).json({ bookings });
+    res.status(200).json(bookings);
   } catch (error) {
     console.log(error);
     const err = error as Error;
@@ -70,32 +70,19 @@ export const updateBookingStatus = async (req: Request, res: Response) => {
   try {
     const bookingId = +req.params.id;
     const userId = res.locals.user.id;
+    const role = res.locals.user.role;
     const data = req.body;
 
     const booking = await bookingService.updateBookingStatus(
       bookingId,
       userId,
-      data
+      data,
+      role
     );
 
     res
       .status(200)
       .json({ message: "Booking status updated successfully", booking });
-  } catch (error) {
-    console.log(error);
-    const err = error as Error;
-    res.status(500).json({ error: err.message });
-  }
-};
-
-export const deleteBooking = async (req: Request, res: Response) => {
-  try {
-    const bookingId = +req.params.id;
-    const userId = res.locals.user.id;
-
-    const booking = await bookingService.deleteBooking(bookingId, userId);
-
-    res.status(200).json({ message: "Booking deleted successfully", booking });
   } catch (error) {
     console.log(error);
     const err = error as Error;

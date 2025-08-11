@@ -14,7 +14,6 @@ workerRouter.put("/approve/:id", authentication, isAdmin, workerController.appro
 
 workerRouter.put("/profile", authentication, upload.single("avatar"),workerController.updateWorker);
 
-// skill router
 workerRouter.post("/skill", authentication,workerController.addWorkerSkill);
 workerRouter.delete("/skill/:id", authentication,workerController.deleteWorkerSkill);
 workerRouter.put("/skill/:id", authentication,workerController.updateWorkerSkill);
